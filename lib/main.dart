@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -111,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
                       }
-                      if (!value.contains('@') || !value.contains(".")) {
+                      if (!EmailValidator.validate(value)) {
                         return 'Please enter a valid email address';
                       }
                       return null;
@@ -121,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     decoration: const InputDecoration(hintText: "Password"),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || !value.isEmpty) {
+                      if (value == null || value.isEmpty) {
                         return 'Please enter some text';
                       }
                       if (value.length < 8) {
@@ -132,18 +138,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
+
                   children: [
                     Flexible(
                         child: SignInButton(
                         Buttons.Google,
                         onPressed: () {})),
+                    SizedBox(width: 10),
                     Flexible(
                         child: SignInButton(
                         Buttons.Apple,
                         onPressed: () {}))
                   ],
                 ),
-                ElevatedButton(onPressed: () {}, child: const Text("Sign In"))
+                ElevatedButton(onPressed: () {
+                  _formKey.currentState!.validate();
+                },
+                    child: const Text("Sign In"))
               ]
           ),
           )
